@@ -1,0 +1,55 @@
+{
+    "data_source": {
+        "ticker_data_path": "D:/Code/InterActiveBrokers_Project/data/MasterJsonTickerData/tickers",
+        "file_pattern": "*.json",
+        "excluded_files": ["MASTER.json", "TICKER_INFORMATION_*.json", "TEST_*.json"]
+    },
+    "database": {
+        "path": "data/credit_analysis.db",
+        "backup_enabled": true
+    },
+    "export": {
+        "output_dir": "output",
+        "default_filename": "credit_analysis_report",
+        "include_timestamp": true
+    },
+    "analysis": {
+        "simulation": {
+            "revenue_multiplier": 1000000,
+            "operating_margin": 0.15,
+            "ebitda_margin": 0.20,
+            "debt_to_revenue_ratio": 0.40,
+            "interest_rate": 0.05,
+            "tax_rate": 0.25,
+            "depreciation_rate": 0.03,
+            "capex_rate": 0.05,
+            "working_capital_change_rate": 0.02
+        },
+        "risk_thresholds": {
+            "dscr": {
+                "healthy": 1.5,
+                "warning": 1.25,
+                "critical": 1.0
+            },
+            "debt_to_equity": {
+                "healthy": 1.0,
+                "warning": 2.0,
+                "critical": 3.0
+            },
+            "debt_to_ebitda": {
+                "healthy": 3.0,
+                "warning": 4.0,
+                "critical": 5.0
+            },
+            "interest_coverage": {
+                "healthy": 3.0,
+                "warning": 2.0,
+                "critical": 1.5
+            }
+        }
+    },
+    "logging": {
+        "level": "INFO",
+        "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    }
+}
