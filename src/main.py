@@ -165,13 +165,22 @@ def generate_summary(results: dict, logger: logging.Logger) -> dict:
 
     # DSCR summary
     dscr_values = [r["dscr"]["value"] for r in results["dscr_results"] if r["dscr"]["value"] is not None]
-    high_risk_dscr = sum(1 for r in results["dscr_results"] if r["dscr"]["risk_level"] == "HIGH")
+    high_risk_dscr_tickers = {
+        r["ticker"] for r in results["dscr_results"] if r["dscr"]["risk_level"] == "HIGH"
+    }
+    high_risk_dscr = len(high_risk_dscr_tickers)
 
     # Leverage summary
-    high_leverage = sum(
-        1 for r in results["leverage_ratios"]
+    high_leverage_tickers = {
+        r["ticker"] for r in results["leverage_ratios"]
         if any(ratio.get("risk_level") == "HIGH" for ratio in r["ratios"].values())
-    )
+    }
+    high_leverage = len(high_leverage_tickers)
+
+    # A company can be flagged HIGH on both DSCR and leverage; count the
+    # distinct at-risk companies (union) so healthy/high_risk are not
+    # double-counted.
+    at_risk_tickers = high_risk_dscr_tickers | high_leverage_tickers
 
     summary = {
         "total_companies": total_companies,
@@ -186,9 +195,9 @@ def generate_summary(results: dict, logger: logging.Logger) -> dict:
             "high_leverage_count": high_leverage
         },
         "risk_summary": {
-            "healthy": total_companies - high_risk_dscr - high_leverage,
+            "healthy": total_companies - len(at_risk_tickers),
             "warning": 0,  # Would need more detailed tracking
-            "high_risk": high_risk_dscr + high_leverage
+            "high_risk": len(at_risk_tickers)
         }
     }
 

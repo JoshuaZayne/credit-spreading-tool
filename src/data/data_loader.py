@@ -8,6 +8,7 @@ Loads JSON ticker data and simulates financial metrics from OHLCV data.
 import json
 import logging
 import fnmatch
+import hashlib
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 from datetime import datetime
@@ -236,7 +237,11 @@ class DataLoader:
             net_income = ebt - taxes
 
             # Working capital changes
-            working_capital_change = revenue * 0.02 * (1 if np.random.random() > 0.5 else -1)
+            # Deterministic per-ticker sign so simulated output is reproducible
+            # across runs (this value feeds real analysis output).
+            wc_seed = int(hashlib.sha256(ticker.encode("utf-8")).hexdigest(), 16) % (2**32)
+            wc_sign = 1 if np.random.default_rng(wc_seed).random() > 0.5 else -1
+            working_capital_change = revenue * 0.02 * wc_sign
 
             # Capital expenditures
             capex = revenue * 0.05
